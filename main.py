@@ -2,7 +2,17 @@ from app.data.db import connect_database
 from app.data.schema import create_all_tables
 from app.services.user_service import register_user, login_user, migrate_users_from_file
 from app.data.incidents import insert_incident, get_all_incidents
+from app.data.csv_loaders import load_all_csv_data
 
+
+def csv():
+
+    # Loading  CSV data
+    print("Loading CSV data...")
+    conn = connect_database()
+    total_rows = load_all_csv_data(conn)
+    conn.close()
+    print(f"       Loaded {total_rows} total rows from CSV files")
 
 def main():
     print("=" * 60)
@@ -53,3 +63,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    csv()
