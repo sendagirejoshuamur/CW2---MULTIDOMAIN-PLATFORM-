@@ -38,14 +38,12 @@ def create_datasets_metadata_table(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS datasets_metadata (
-            id INTEGER PRIMARY KEY,
-            dataset_id TEXT UNIQUE NOT NULL,
+            dataset_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             rows INTEGER NOT NULL,
             columns INTEGER NOT NULL,
             uploaded_by TEXT NOT NULL,
-            upload_date TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            upload_date DATE NOT NULL,
             FOREIGN KEY (uploaded_by) REFERENCES users(username)
         )
     """)
@@ -56,8 +54,7 @@ def create_it_tickets_table(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS it_tickets (
-            id INTEGER PRIMARY KEY,
-            ticket_id TEXT NOT NULL UNIQUE,
+            ticket_id INTEGER PRIMARY KEY,
             priority TEXT NOT NULL,
             description TEXT NOT NULL,
             status TEXT NOT NULL,

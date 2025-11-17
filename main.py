@@ -3,7 +3,8 @@ from app.data.schema import create_all_tables
 from app.services.user_service import register_user, login_user, migrate_users_from_file
 from app.data.incidents import insert_incident, get_all_incidents
 from app.data.csv_loaders import load_all_csv_data
-
+from app.data.tickets import*
+from app.data.datasets import *
 
 def csv():
 
@@ -25,14 +26,14 @@ def main():
     conn.close()
 
     # 2. Migrate users
-    migrate_users_from_file()
+    # migrate_users_from_file()
     #
     # 3. Test authentication
-    success, msg = register_user("alice", "SecurePass123!", "analyst")
-    print(msg)
-    #
-    success, msg = login_user("alice", "SecurePass123!")
-    print(msg)
+    # success, msg = register_user("alice", "SecurePass123!", "analyst")
+    # print(msg)
+    # #
+    # success, msg = login_user("alice", "SecurePass123!")
+    # print(msg)
 
     # incident_id = insert_incident(
     #     "2024-11-05",  # This should be incident_id, but looks like a timestamp
@@ -56,11 +57,36 @@ def main():
     # )
     # print(f"Created incident #{incident_id}")
 
-    # 5. Query data
-    df = get_all_incidents()
-    print(f"Total incidents: {len(df)}")
+    # ticket_id = insert_into_tickets(
+    #     "9111",  # ticket_id
+    #     "High",  # priority
+    #     "sj needs a first class",  # description
+    #     "Open",  # status
+    #     "John sj",  # assigned_to
+    #     "2024-01-15 10:00:00",  # created_at
+    #     "72"  # resolution_time_hours
+    # )
+    # print(f"inserted into Ticket ID: {ticket_id}")
+
+    # deleted the ticket
+    # delete_tickets(9111)
+
+    # Query data
+    # df = get_all_incidents()
+    # print(f"Total incidents: {len(df)}")
+
+
+    # insert_into_datasets(
+    #     "91",
+    #     "sj",
+    #     "9000",
+    #     "1009",
+    #     "it_sj",
+    #     "00/00/2000"
+    # )
+
+    delete_from_datasets(91)
 
 
 if __name__ == "__main__":
     main()
-    csv()

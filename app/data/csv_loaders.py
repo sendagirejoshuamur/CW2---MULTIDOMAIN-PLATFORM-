@@ -30,11 +30,11 @@ def load_csv_to_table(conn, csv_path, table_name):
             index=False
         )
 
-        print(f"✅ Loaded {row_count} rows into {table_name} table from {csv_path.name}")
+        print(f"(-_-) Loaded {row_count} rows into {table_name} table from {csv_path.name}")
         return row_count
 
     except Exception as e:
-        print(f"❌ Error loading {csv_path}: {e}")
+        print(f"XX Error loading {csv_path}: {e}")
         return 0
 
 
