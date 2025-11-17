@@ -7,7 +7,11 @@ def connect_database(db_path=DB_PATH):
     """Connect to SQLite database."""
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    return sqlite3.connect(str(db_path))
+    return sqlite3.connect(str(DB_PATH))
+
+
+connect_database(DB_PATH)
+
 
 
 

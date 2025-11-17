@@ -22,12 +22,13 @@ def create_cyber_incidents_table(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS cyber_incidents (
-            incident_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            severity TEXT CHECK(severity IN ('Low', 'Medium', 'High', 'Critical')) DEFAULT 'Low',
-            category TEXT NOT NULL, 
-            status TEXT CHECK(status IN ('Open', 'Investigating', 'Resolved', 'Closed')) DEFAULT 'Open',
-            description TEXT
+            incident_id TEXT PRIMARY KEY,
+            timestamp TIMESTAMP TEXT,
+            severity TEXT,
+            category TEXT, 
+            status TEXT,
+            description TEXT,
+            reported_by TEXT
         )
     """)
     conn.commit()
@@ -37,7 +38,7 @@ def create_datasets_metadata_table(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS datasets_metadata (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             dataset_id TEXT UNIQUE NOT NULL,
             name TEXT NOT NULL,
             rows INTEGER NOT NULL,
@@ -55,7 +56,7 @@ def create_it_tickets_table(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS it_tickets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             ticket_id TEXT NOT NULL UNIQUE,
             priority TEXT NOT NULL,
             description TEXT NOT NULL,
@@ -68,7 +69,7 @@ def create_it_tickets_table(conn):
     conn.commit()
 
 # Creating all tables
-def initialize_database(conn):
+def create_all_tables(conn):
     create_users_table(conn)
     create_cyber_incidents_table(conn)
     create_datasets_metadata_table(conn)
@@ -77,4 +78,4 @@ def initialize_database(conn):
 DB_PATH = Path(r"C:\Users\senda\Desktop\CW2_M01045908_CST1510\DATA") / "intelligence_platform.db"
 
 conn = sqlite3.connect(DB_PATH)
-initialize_database(conn)
+create_all_tables(conn)

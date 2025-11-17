@@ -200,6 +200,7 @@ def display_menu():
 
 
 
+
 def main():
     # main program loop
     print("\nWelcome to the week 7 Authentication System")
