@@ -1,6 +1,7 @@
 import bcrypt
 import os
 import re
+import streamlit as st
 
 
 def hashpassword(plain_text_password):
@@ -123,7 +124,7 @@ def validate_username(username):
     # Check if username is empty
     if not username:
         return False, "Username cannot be empty."
-    
+
     # Check length requirements
     if len(username) < 3:
         return False, "Username must be at least 3 characters long."
@@ -221,8 +222,7 @@ def main():
                 print(f"Error: {error_msg}")
                 continue
 
-            # checking if the username exists - THIS SHOULD NOW WORK
-            if user_exists(username):
+            # checking if the username exists            if user_exists(username):
                 print(f"Error: Username '{username}' is already taken. Please choose a different username.")
                 continue
 
