@@ -34,7 +34,7 @@ def verify_password(hashed_password_string, plain_text_password):
     return is_valid
 
 # creating a textfile to store the users login info
-USER_DATA_FILE = 'users.txt'
+USER_DATA_FILE = 'DATA/user_info.txt'
 
 
 def user_exists(username):
@@ -60,7 +60,7 @@ def user_exists(username):
 
 
 
-def register_user(username, password):
+def register_user(username, password, role):
     # checking if the username exists
     if user_exists(username):
         print(f"User {username} already exists")
@@ -70,10 +70,10 @@ def register_user(username, password):
     hashed_password = hashpassword(password)
 
     try :
-        # appending the username and hashed password to the file
+        # appending the username, hashed password and role to the file
         with open(USER_DATA_FILE, 'a') as f:
-            f.write(f"{username},{hashed_password}\n")
-            print(f"User {username} registered successfully")
+            f.write(f"{username},{hashed_password},{role}\n")
+            print(f"User {username} registered successfully with role: {role}")
             return True
 
     except Exception as error:
@@ -93,14 +93,23 @@ def login_user(username, password):
             for line in f:
                 stored_username = line.strip().split(',')[0]
                 stored_hash = line.strip().split(',')[1]
+                role = line.strip().split(',')[2]
 
+                # check username
                 if stored_username == username:
+                    # check password
                     if verify_password(stored_hash, password):
                         print(f"successfully logged in: {stored_username}")
+
+                        # If the user is admin it will return admin flag
+                        if role == "admin":
+                            return "admin"
+
                         return True
                     else:
                         print(f"invalid password login failed with: {stored_username}")
                         return False
+
 
         # If we get here, we've checked all users and didn't find the username
         print("username not found")

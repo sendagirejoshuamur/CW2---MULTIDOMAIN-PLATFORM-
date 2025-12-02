@@ -17,14 +17,14 @@ def get_user_by_username(username):
     return user
 
 def insert_user(username, password_hash, role='user'):
-    # function to insert a new user
     conn = connect_database()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+        "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
         (username, password_hash, role)
     )
     conn.commit()
+    conn.close()
 
 
 def get_all_users():
@@ -39,3 +39,43 @@ def get_all_users():
     conn.commit()
     conn.close()
 
+def clear_users_table():
+    conn = connect_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM users")
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")  # reset ID counter
+        conn.commit()
+        print("Users table cleared and ID counter reset.")
+    except Exception as e:
+        print("Error clearing users table:", e)
+    finally:
+        conn.close()
+
+
+def clear_database():
+    """
+    Deletes all data from all main tables in the database
+    and resets their auto-increment IDs.
+    """
+    conn = connect_database()
+    cursor = conn.cursor()
+
+    try:
+        # List all main tables
+        tables = ["users", "cyber_incidents", "it_tickets", "datasets_metadata"]
+
+        for table in tables:
+            cursor.execute(f"DELETE FROM {table}")
+            cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table}'")  # reset autoincrement
+
+        conn.commit()
+        return True
+
+    except Exception as e:
+        print("Error clearing database:", e)
+        return False
+
+    finally:
+        conn.close()

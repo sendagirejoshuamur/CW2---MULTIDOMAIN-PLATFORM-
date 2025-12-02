@@ -5,7 +5,7 @@ from app.data.db import connect_database
 
 def load_csv_to_table(conn, csv_path, table_name):
     """
-    Load a CSV file into a database table using pandas.
+    Loading a CSV file into a database table using pandas.
     """
     # path().exists checks if the file path exsits
     if not Path(csv_path).exists():
@@ -41,7 +41,7 @@ def load_csv_to_table(conn, csv_path, table_name):
 
 def load_all_csv_data(conn):
     """
-    Load all CSV files into their respective tables.
+    Loading all CSV files into their respective tables.
 
     Args:
         conn: Database connection

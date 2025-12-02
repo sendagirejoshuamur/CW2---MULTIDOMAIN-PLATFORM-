@@ -5,17 +5,19 @@ from pathlib import Path
 
 
 def create_users_table(conn):
-    """Create users table."""
     cursor = conn.cursor()
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
+            username TEXT UNIQUE COLLATE BINARY NOT NULL,
             password_hash TEXT NOT NULL,
             role TEXT DEFAULT 'user'
         )
     """)
+
     conn.commit()
+
 
 def create_cyber_incidents_table(conn):
     """Creating cyber incidents table."""
@@ -65,12 +67,28 @@ def create_it_tickets_table(conn):
     """)
     conn.commit()
 
+def create_uploads_table(conn):
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS uploads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            filename TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+
 # Creating all tables
 def create_all_tables(conn):
     create_users_table(conn)
     create_cyber_incidents_table(conn)
     create_datasets_metadata_table(conn)
     create_it_tickets_table(conn)
+    create_uploads_table(conn)
+
+
 
 DB_PATH = Path(r"C:\Users\senda\Desktop\CW2_M01045908_CST1510\DATA") / "intelligence_platform.db"
 

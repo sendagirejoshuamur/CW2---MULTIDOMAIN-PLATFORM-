@@ -1,0 +1,5 @@
+joshua,$2b$12$hBb7a5xoFhZp4a6HMeoKKemc9844ZHiEz9SIJAQp0GNtLV9BAKZ1.,admin
+normal,$2b$12$KCvUcxidQk58lnroLFcxeuOpoA7lmADv7JPb/oxvuR37Ha/JVWHly,user
+erick,$2b$12$9bRcRtFazk0MENfiirYN.u01TU/KSZ8JmPSKdWWTI1WLsnsuznZE.,admin
+erick,$2b$12$kd27LGQmgjj6ll.J0REv2.c1XJoOT8ek.rjhNJzdcZKlndDozWy9q,admin
+Admin,$2b$12$JD4Ky7mZaoKXSWwNhNTWWO7KrH7ODgodnGyB9duGOzAD9oqXuToyS,admin

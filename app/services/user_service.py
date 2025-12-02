@@ -1,3 +1,5 @@
+import os
+
 import bcrypt
 from pathlib import Path
 from app.data.db import connect_database
@@ -57,54 +59,57 @@ def login_user(username, password):
 # DB_PATH = Path(r"C:\Users\senda\Desktop\CW2_M01045908_CST1510\DATA") / "intelligence_platform.db"
 # filepath= Path(r"C:\Users\senda\Desktop\CW2_M01045908_CST1510\DATA") / "users.txt"
 # filepath='DATA/users.txt'
-def migrate_users_from_file(filepath= Path(r"C:\Users\senda\Desktop\CW2_M01045908_CST1510\DATA") / "users.txt"):
+import os
+from pathlib import Path
+from app.data.db import connect_database
+from app.data.users import insert_user  # Use your insert_user function
+
+def migrate_users_from_file(filepath="DATA/user_info.txt"):
     """
-    Migrate users from text file to database.
+    Migrate users from a text file into the database using insert_user function.
 
     Args:
-        filepath: Path to users.txt file
+        filepath (str): Path to the users.txt file
 
     Returns:
         int: Number of users migrated
     """
-    if not Path(filepath).exists():
+    filepath = Path(filepath)
+    print("Checking file:", filepath)
+    print("Exists:", os.path.exists(filepath))
+
+    if not filepath.exists():
         print(f"File not found: {filepath}")
         return 0
 
-    conn = connect_database()
-    cursor = conn.cursor()
     migrated_count = 0
+    print(f"Reading users from: {filepath}")
 
-    with open(filepath, 'r') as f:
+    with open(filepath, "r") as f:
         for line in f:
             line = line.strip()
-            if not line:
+            if not line or line.startswith("#"):
                 continue
 
-            # Parse line: username,password_hash,role
-            parts = line.split(',')
-            if len(parts) >= 2:
-                username = parts[0]
-                password_hash = parts[1]
-                role = parts[2] if len(parts) > 2 else 'user'
+            parts = line.split(",")
+            if len(parts) < 2:
+                print(f"Invalid line (skipped): {line}")
+                continue
 
-                # Insert user (ignore if already exists)
-                try:
-                    cursor.execute(
-                        "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-                        (username, password_hash, role)
-                    )
-                    if cursor.rowcount > 0:
-                        migrated_count += 1
-                        print(f"Migrated user: {username}")
-                except Exception as e:
-                    print(f"Error migrating user {username}: {e}")
+            username = parts[0].strip()
+            password_hash = parts[1].strip()
+            role = parts[2].strip() if len(parts) > 2 else "user"
 
-    conn.commit()
-    conn.close()
+            # Use insert_user function
+            success = insert_user(username, password_hash, role)
+            if success:
+                migrated_count += 1
+                print(f"Migrated user: {username}")
+            else:
+                print(f"Skipped (already exists): {username}")
+
     print(f"Migration complete! {migrated_count} users migrated.")
     return migrated_count
-
 
 def change_user_password(username, old_password, new_password):
     """
