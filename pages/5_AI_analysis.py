@@ -6,12 +6,10 @@ from app.data.tickets import *
 from app.data.datasets import *
 import time
 
-
 # Login check
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
     st.warning("Please log in first.")
     st.stop()
-
 
 # Initialize Gemini AI client using API key from secrets
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
@@ -407,6 +405,52 @@ def analyze_with_ai_simple(data_type, analysis_type, data_context, raw_data):
     return "Unable to analyze at this time. Please try again later."
 
 
+# chat with ai function
+def simple_chat():
+    """Simple chat interface with AI"""
+    st.subheader("💬 Chat with AI")
+
+    # Initialize chat history
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = []
+
+    # Display chat history
+    for message in st.session_state.chat_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Chat input
+    if user_input := st.chat_input("Ask me anything..."):
+        # Add user message to chat history
+        st.session_state.chat_messages.append({"role": "user", "content": user_input})
+
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        # Generate AI response
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                try:
+                    response = client.models.generate_content(
+                        model="gemini-2.0-flash",
+                        contents=[{"role": "user", "parts": [{"text": user_input}]}],
+                    )
+                    ai_response = response.text
+                    st.markdown(ai_response)
+
+                    # Add AI response to chat history
+                    st.session_state.chat_messages.append({"role": "assistant", "content": ai_response})
+
+                except Exception as e:
+                    st.error(f"Sorry, I encountered an error: {str(e)}")
+
+    # Clear chat button
+    if st.button("Clear Chat", type="secondary"):
+        st.session_state.chat_messages = []
+        st.rerun()
+
+
 #  MAIN APPLICATION
 
 def main():
@@ -423,79 +467,91 @@ def main():
 
     st.title("Data Analysis Assistant")
 
-    # Step 1: User selects what type of data to analyze
-    data_type = st.radio(
-        "What would you like to analyze?",
-        ["Datasets", "Security Incidents", "IT Tickets"],
-        horizontal=True
+    #radio button to choose between data analysis and chat
+    mode = st.radio(
+        "Choose mode:",
+        ["Data Analysis", "Chat with AI"],
+        horizontal=True,
+        key="mode_selector"
     )
 
-    # Get analysis based on user selection
-    analysis_type = ""
-    data_context = ""
-    raw_data = ""
+    if mode == "Data Analysis":
+        # Step 1: User selects what type of data to analyze
+        data_type = st.radio(
+            "What would you like to analyze?",
+            ["Datasets", "Security Incidents", "IT Tickets"],
+            horizontal=True
+        )
 
-    if data_type == "Datasets":
-        analysis_type, data_context, raw_data = get_datasets_analysis()
-    elif data_type == "Security Incidents":
-        analysis_type, data_context, raw_data = get_incidents_analysis()
-    else:  # Tickets
-        analysis_type, data_context, raw_data = get_tickets_analysis()
+        # Get analysis based on user selection
+        analysis_type = ""
+        data_context = ""
+        raw_data = ""
 
-    # Show preview of data before sending to AI
-    if raw_data:
-        st.subheader("Data Preview")
-        with st.expander("View raw data", expanded=False):
-            st.text(raw_data[:500] + "..." if len(raw_data) > 500 else raw_data)
+        if data_type == "Datasets":
+            analysis_type, data_context, raw_data = get_datasets_analysis()
+        elif data_type == "Security Incidents":
+            analysis_type, data_context, raw_data = get_incidents_analysis()
+        else:  # Tickets
+            analysis_type, data_context, raw_data = get_tickets_analysis()
 
-    # Step 2: Analyze button (only enabled if we have data)
-    if st.button("Analyze with AI", type="primary", disabled=not raw_data):
-        with st.spinner("Analyzing data with AI..."):
-            # Get AI analysis
-            ai_response = analyze_with_ai_simple(data_type, analysis_type, data_context, raw_data)
+        # Show preview of data before sending to AI
+        if raw_data:
+            st.subheader("Data Preview")
+            with st.expander("View raw data", expanded=False):
+                st.text(raw_data[:500] + "..." if len(raw_data) > 500 else raw_data)
 
-            # Display results
+        # Step 2: Analyze button (only enabled if we have data)
+        if st.button("Analyze with AI", type="primary", disabled=not raw_data):
+            with st.spinner("Analyzing data with AI..."):
+                # Get AI analysis
+                ai_response = analyze_with_ai_simple(data_type, analysis_type, data_context, raw_data)
+
+                # Display results
+                st.markdown("---")
+                st.subheader("AI Analysis Results")
+
+                # Store analysis in session state for history
+                if 'analyses' not in st.session_state:
+                    st.session_state.analyses = []
+
+                analysis_entry = {
+                    'data_type': data_type,
+                    'analysis_type': analysis_type,
+                    'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+                    'ai_response': ai_response,
+                    'data_preview': raw_data[:200] + "..." if len(raw_data) > 200 else raw_data
+                }
+
+                st.session_state.analyses.append(analysis_entry)
+
+                # Show AI analysis
+                st.markdown(ai_response)
+
+                # Option to view full raw data
+                with st.expander("View Full Raw Data", expanded=False):
+                    st.text(raw_data)
+
+        # Step 3: Show analysis history (last 5 analyses)
+        if 'analyses' in st.session_state and st.session_state.analyses:
             st.markdown("---")
-            st.subheader("AI Analysis Results")
+            st.subheader("Analysis History")
 
-            # Store analysis in session state for history
-            if 'analyses' not in st.session_state:
+            for i, analysis in enumerate(reversed(st.session_state.analyses[-5:])):
+                with st.expander(f"{analysis['data_type']} - {analysis['analysis_type']} ({analysis['timestamp']})",
+                                 expanded=(i == 0)):
+                    st.markdown(analysis['ai_response'])
+                    with st.expander("View data used"):
+                        st.text(analysis['data_preview'])
+
+        # Clear history button
+        if st.button("Clear History", type="secondary"):
+            if 'analyses' in st.session_state:
                 st.session_state.analyses = []
+            st.rerun()
 
-            analysis_entry = {
-                'data_type': data_type,
-                'analysis_type': analysis_type,
-                'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
-                'ai_response': ai_response,
-                'data_preview': raw_data[:200] + "..." if len(raw_data) > 200 else raw_data
-            }
-
-            st.session_state.analyses.append(analysis_entry)
-
-            # Show AI analysis
-            st.markdown(ai_response)
-
-            # Option to view full raw data
-            with st.expander("View Full Raw Data", expanded=False):
-                st.text(raw_data)
-
-    # Step 3: Show analysis history (last 5 analyses)
-    if 'analyses' in st.session_state and st.session_state.analyses:
-        st.markdown("---")
-        st.subheader("Analysis History")
-
-        for i, analysis in enumerate(reversed(st.session_state.analyses[-5:])):
-            with st.expander(f"{analysis['data_type']} - {analysis['analysis_type']} ({analysis['timestamp']})",
-                             expanded=(i == 0)):
-                st.markdown(analysis['ai_response'])
-                with st.expander("View data used"):
-                    st.text(analysis['data_preview'])
-
-    # Clear history button
-    if st.button("Clear History", type="secondary"):
-        if 'analyses' in st.session_state:
-            st.session_state.analyses = []
-        st.rerun()
+    else:  # Chat with AI mode
+        simple_chat()
 
 
 # Start the application
