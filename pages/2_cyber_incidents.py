@@ -48,20 +48,11 @@ if 'status' in data.columns:
 # QUICK STATS (using your database column names)
 st.subheader("Quick Stats")
 if not data.empty:
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
 
     with col1:
         st.metric("Total Incidents", len(data))
-
     with col2:
-        open_count = len(data[data['status'] == 'open']) if 'status' in data.columns else 0
-        st.metric("Open Incidents", open_count)
-
-    with col3:
-        high_count = len(data[data['severity'] == 'high']) if 'severity' in data.columns else 0
-        st.metric("High Severity", high_count)
-
-    with col4:
         # Use your actual category column name
         if 'category' in data.columns:
             phishing_count = len(data[data['category'].str.contains('phishing', case=False, na=False)])
