@@ -2,7 +2,7 @@
 
 **Student Name:** Joshua Sendagire  
 **Student ID:** M01045908  
-**Course:** CST1510 - CW2 - Multi-Domain Intelligence Platform  
+**Project:** CST1510 - CW2 - Multi-Domain Intelligence Platform  
 
 ---
 
