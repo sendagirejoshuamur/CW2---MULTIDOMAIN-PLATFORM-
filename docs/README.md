@@ -178,7 +178,6 @@ The interface maintains consistency across modules with sidebar controls, main c
 - Real-time data streaming and alerts
 - Integration with external threat intelligence feeds
 - Mobile-responsive design and progressive web app features
-- API endpoints for system integration
 - Advanced reporting and automated documentation
 
 ---
