@@ -11,9 +11,6 @@
 A comprehensive, web-based multi-domain intelligence and incident management platform built with Streamlit. This application provides a unified dashboard for visualizing and analyzing cyber incidents, IT service tickets, and datasets across security and operational domains. The platform features secure authentication, interactive data exploration, and actionable insights through a modern, layered architecture.
 
 ---
-Here's your **Login Credentials** section formatted properly for a README file:
-
----
 
 ## Login Credentials
 
